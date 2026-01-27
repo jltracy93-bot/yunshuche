@@ -1,0 +1,8 @@
+{
+  "name": "固废运输全流程取证系统",
+  "description": "提供煤灰运输全流程管理，包含OBD定位、地磅对接、道闸联动及移动端拍照取证。",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
