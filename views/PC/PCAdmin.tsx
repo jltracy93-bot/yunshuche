@@ -321,7 +321,7 @@ const PCAdmin: React.FC = () => {
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black text-slate-400 uppercase">运单状态</label>
-              <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold outline-none" value={filters.status} onChange={e => setFilters({...filters, status: e.target.value})}>
+              <select className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold outline-none" value={filters.status} onChange={e => setFilters({...filters, status: e.target.value})} { ...filters.status }>
                 <option value="">全部</option>
                 <option value="已完成">已完成</option>
                 <option value="运输中">运输中</option>
@@ -339,10 +339,10 @@ const PCAdmin: React.FC = () => {
           <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
             <div>
               <h3 className="text-lg font-bold text-slate-900">{config.title}</h3>
-              <p className="text-xs text-slate-400 mt-1">共 {data.length} 条符合条件的记录</p>
+              <p className="text-xs text-slate-400 mt-1">共 {data.length} 条记录</p>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="flex items-center space-x-2 px-6 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all" onClick={() => alert('选择本地Excel文件')}>
+              <button className="flex items-center space-x-2 px-6 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-all">
                 <Icons.Import />
                 <span>导入数据</span>
               </button>
@@ -361,7 +361,7 @@ const PCAdmin: React.FC = () => {
               <tr>
                 <th className="px-6 py-5">#</th>
                 {moduleId === 'orders' 
-                   ? ['运单号/日期', '车牌号码', '入场/出场', '拉运量(T)', '货物分类', '状态', '流转证据及节点'].map(h => <th key={h} className="px-6 py-5">{h}</th>)
+                   ? ['运单号/日期', '车牌号码', '入场/出场', '拉运量(T)', '货物分类', '状态', '证据节点'].map(h => <th key={h} className="px-6 py-5">{h}</th>)
                    : config.columns.map((h: string) => <th key={h} className="px-6 py-5">{h}</th>)
                 }
                 <th className="px-6 py-5 text-right">操作</th>
@@ -392,12 +392,9 @@ const PCAdmin: React.FC = () => {
                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black border ${item.status === '已完成' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>{item.status}</span>
                       </td>
                       <td className="px-6 py-5">
-                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-slate-800">{item.node}</span>
-                            <div className="flex space-x-1 mt-1.5">
-                               {item.photos?.entry && <img onClick={(e)=>{e.stopPropagation(); setPreviewImage(item.photos.entry)}} src={item.photos.entry} className="w-8 h-8 rounded-lg object-cover border border-slate-200" alt="entry" />}
-                               {item.photos?.gate && <img onClick={(e)=>{e.stopPropagation(); setPreviewImage(item.photos.gate)}} src={item.photos.gate} className="w-8 h-8 rounded-lg object-cover border border-slate-200" alt="gate" />}
-                            </div>
+                         <div className="flex items-center space-x-1">
+                            {item.photos?.entry && <img onClick={(e)=>{e.stopPropagation(); setPreviewImage(item.photos.entry)}} src={item.photos.entry} className="w-8 h-8 rounded-lg object-cover border border-slate-200" />}
+                            <span className="text-[10px] text-slate-400">{item.node}</span>
                          </div>
                       </td>
                     </>
@@ -417,7 +414,7 @@ const PCAdmin: React.FC = () => {
                       <>
                         <button onClick={(e) => {e.stopPropagation(); setPlaybackOrder(item);}} className="text-[11px] font-bold text-blue-600 hover:underline">轨迹回放</button>
                         <button onClick={(e) => {e.stopPropagation(); setSelectedOrder(item);}} className="text-[11px] font-bold text-slate-500 hover:underline">查看详情</button>
-                        <button onClick={(e) => {e.stopPropagation(); alert('确认删除记录？');}} className="text-[11px] font-bold text-rose-500 hover:underline">删除</button>
+                        <button onClick={(e) => {e.stopPropagation(); alert('确认删除？');}} className="text-[11px] font-bold text-rose-500 hover:underline">删除</button>
                       </>
                     ) : (
                       <>
@@ -447,7 +444,6 @@ const PCAdmin: React.FC = () => {
              <p className="text-[9px] text-blue-200/50 uppercase font-black tracking-widest">SolidLink Management</p>
           </div>
         </div>
-
         <nav className="flex-1 py-8 overflow-y-auto no-scrollbar space-y-1">
           {menuItems.map((item) => (
             <button
@@ -479,7 +475,7 @@ const PCAdmin: React.FC = () => {
                  <p className="text-xs font-bold text-slate-900 leading-none">系统管理员</p>
                  <div className="flex items-center justify-end space-x-1 mt-1">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span className="text-[9px] text-slate-400 font-black uppercase">Online</span>
+                    <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest">Online</span>
                  </div>
               </div>
               <div className="w-10 h-10 rounded-2xl bg-[#2B579A] text-white flex items-center justify-center font-bold shadow-lg">AD</div>
@@ -493,65 +489,61 @@ const PCAdmin: React.FC = () => {
         {previewImage && <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setPreviewImage(null)}><div className="relative max-w-4xl max-h-[80vh] bg-white p-2 rounded-2xl overflow-hidden"><img src={previewImage} className="w-full h-full object-contain" alt="preview" /><button className="absolute top-4 right-4 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center">✕</button></div></div>}
         {playbackOrder && <TrajectoryModal order={playbackOrder} onClose={() => setPlaybackOrder(null)} />}
         
-        {/* 工单详情侧滑窗 - 对标小程序补全全部字段 */}
+        {/* 工单详情侧滑窗 */}
         {selectedOrder && activeMenu === 'orders' && (
           <div className="absolute inset-0 z-[100] flex justify-end">
             <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setSelectedOrder(null)}></div>
             <div className="relative w-[750px] bg-white h-full shadow-2xl animate-in slide-in-from-right duration-500 overflow-y-auto no-scrollbar">
               <div className="p-8 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
                 <div>
-                   <h3 className="text-xl font-bold text-slate-900">运单全流程指令详情</h3>
-                   <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">Evidence Chain Report</p>
+                   <h3 className="text-xl font-bold text-slate-900">运单指令流转全记录</h3>
+                   <p className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">Order Evidence Lifecycle</p>
                 </div>
-                <button onClick={() => setSelectedOrder(null)} className="w-10 h-10 hover:bg-slate-50 rounded-full flex items-center justify-center text-slate-400 transition-all">✕</button>
+                <button onClick={() => setSelectedOrder(null)} className="w-10 h-10 hover:bg-slate-50 rounded-full flex items-center justify-center text-slate-400">✕</button>
               </div>
               <div className="p-8 space-y-8 pb-20">
-                {/* 对标小程序：基础档案区 */}
-                <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-inner space-y-6">
+                <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 space-y-6">
                    <div className="grid grid-cols-3 gap-6">
-                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">工单编号</p><p className="font-bold text-slate-900 text-sm">{selectedOrder.id}</p></div>
-                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">业务日期</p><p className="font-bold text-slate-900 text-sm">{selectedOrder.date}</p></div>
+                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">工单编号</p><p className="font-bold text-slate-900">{selectedOrder.id}</p></div>
+                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">业务日期</p><p className="font-bold text-slate-900">{selectedOrder.date}</p></div>
                       <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">当前状态</p><span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[10px] font-black">{selectedOrder.status}</span></div>
                    </div>
                    <div className="grid grid-cols-3 gap-6">
                       <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">车牌号码</p><p className="font-black text-slate-900 text-base">{selectedOrder.plate}</p></div>
-                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">运输师傅</p><p className="font-bold text-slate-900">{selectedOrder.driver}</p></div>
+                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">运输师傅</p><p className="font-bold text-slate-900">{selectedOrder.driver || '张师傅'}</p></div>
                       <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">货物名称</p><p className="font-bold text-slate-900">{selectedOrder.category}</p></div>
                    </div>
                    <div className="grid grid-cols-3 gap-6 pt-4 border-t border-slate-200/50">
                       <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">入场时间</p><p className="font-bold text-emerald-600">{selectedOrder.entryTime}</p></div>
                       <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">出场时间</p><p className="font-bold text-blue-600">{selectedOrder.exitTime}</p></div>
-                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">当前执行节点</p><p className="font-bold text-slate-700">{selectedOrder.node}</p></div>
+                      <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">当前节点</p><p className="font-bold text-slate-700">{selectedOrder.node}</p></div>
                    </div>
                 </div>
 
-                {/* 运送路径区 */}
                 <div className="grid grid-cols-2 gap-6">
                    <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mb-2">始发站点 (发货单位)</p>
-                      <p className="font-bold text-slate-700 text-sm">{selectedOrder.s}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase mb-2">始发站点</p>
+                      <p className="font-bold text-slate-700">{selectedOrder.s || '滨江联合热电厂'}</p>
                    </div>
                    <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mb-2">目的地 (消纳点)</p>
-                      <p className="font-bold text-slate-700 text-sm">{selectedOrder.d}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase mb-2">消纳目的地</p>
+                      <p className="font-bold text-slate-700">{selectedOrder.d || '栖霞再生消纳场'}</p>
                    </div>
                 </div>
 
-                {/* 重量计量区 */}
                 <div className="bg-[#2B579A]/5 p-8 rounded-[2rem] border border-[#2B579A]/10 grid grid-cols-3 gap-6 text-center">
                    <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">皮重 (T)</p><p className="text-2xl font-black text-slate-400">{selectedOrder.tare || '15.10'}</p></div>
                    <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">毛重 (T)</p><p className="text-2xl font-black text-[#2B579A]">{selectedOrder.gross || '39.62'}</p></div>
-                   <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">净重 (T)</p><p className="text-2xl font-black text-emerald-600">{selectedOrder.w1}</p></div>
+                   <div className="space-y-1"><p className="text-[10px] text-slate-400 font-bold uppercase">净重 (T)</p><p className="text-2xl font-black text-emerald-600">{selectedOrder.w1 || selectedOrder.weight}</p></div>
                 </div>
 
-                {/* 对标小程序：流转记录取证 */}
                 <div className="space-y-6 pt-4">
-                   <h4 className="font-bold text-base text-slate-900 border-l-[6px] border-[#2B579A] pl-4">流转取证记录</h4>
+                   <h4 className="font-bold text-base text-slate-900 border-l-[6px] border-[#2B579A] pl-4">三环取证证据链</h4>
                    <div className="space-y-10 pl-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100">
                       {[
-                        { t: '进场过磅环节', d: `采集重量: ${selectedOrder.w1} T | 01# 地磅`, time: selectedOrder.entryTime, icon: '⚖️', img: selectedOrder.photos?.entry },
-                        { t: '出厂道闸抓拍', d: '南门闸机车牌自动识别', time: selectedOrder.exitTime, icon: '📸', img: selectedOrder.photos?.gate },
-                        { t: '倾倒消纳核销', d: '指定区域倾倒现场取证拍照', time: '18:12:45', icon: '✅', img: selectedOrder.photos?.dump }
+                        { t: '进场过磅核验', d: `采集净重: ${selectedOrder.weight} T | 01# 地磅`, time: selectedOrder.entryTime, icon: '⚖️', img: selectedOrder.photos?.entry },
+                        { t: '出厂道闸联动', d: '道闸自动抓拍 | 车牌识别通过', time: selectedOrder.exitTime, icon: '📸', img: selectedOrder.photos?.gate },
+                        { t: '卸货倾倒核销', d: '指定区域倾倒取证拍照', time: '--', icon: '✅', img: selectedOrder.photos?.dump }
                       ].map((n, i) => (
                         <div key={i} className="relative pl-12 group">
                            <div className="absolute left-0 top-1 w-7 h-7 rounded-xl border-4 border-white bg-[#2B579A] shadow-lg z-10 flex items-center justify-center text-[10px]">{n.icon}</div>
@@ -559,52 +551,20 @@ const PCAdmin: React.FC = () => {
                              <div><p className="text-sm font-bold text-slate-900">{n.t}</p><p className="text-xs text-slate-400 mt-1">{n.d}</p></div>
                              <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">{n.time}</span>
                            </div>
-                           {n.img && <div className="mt-4"><div className="w-40 aspect-video bg-slate-100 rounded-xl border border-slate-200 overflow-hidden cursor-zoom-in" onClick={() => setPreviewImage(n.img)}><img src={n.img} className="w-full h-full object-cover" /></div></div>}
+                           {n.img && <div className="mt-4"><div className="w-48 aspect-video bg-slate-100 rounded-xl border border-slate-200 overflow-hidden cursor-zoom-in" onClick={() => setPreviewImage(n.img)}><img src={n.img} className="w-full h-full object-cover" /></div></div>}
                         </div>
                       ))}
                    </div>
                 </div>
-                
-                <button 
-                  onClick={() => setPlaybackOrder(selectedOrder)}
-                  className="w-full h-14 bg-slate-900 text-white rounded-2xl font-bold text-sm flex items-center justify-center space-x-3 shadow-xl active:scale-[0.98] transition-all"
-                >
-                  <Icons.Dashboard /><span>查看该工单详细历史轨迹回放</span>
-                </button>
               </div>
             </div>
           </div>
         )}
-
-        {showAddModal && (
-          <div className="absolute inset-0 z-[100] flex justify-center items-center">
-             <div onClick={() => setShowAddModal(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-fade-in"></div>
-             <div className="relative bg-white w-[560px] rounded-[2rem] shadow-2xl p-10 space-y-6 animate-in zoom-in-95 duration-300">
-                <div className="flex justify-between items-center border-b border-slate-50 pb-4">
-                    <h3 className="text-lg font-bold text-slate-900">数据登记维护</h3>
-                    <button onClick={() => setShowAddModal(false)} className="text-slate-300">✕</button>
-                </div>
-                <div className="space-y-4">
-                   <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1"><label className="text-[10px] font-bold text-slate-400 uppercase">主要名称</label><input type="text" className="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl text-sm font-bold outline-none" /></div>
-                      <div className="space-y-1"><label className="text-[10px] font-bold text-slate-400 uppercase">分类</label><select className="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl text-sm font-bold outline-none"><option>默认分类</option></select></div>
-                   </div>
-                   <div className="space-y-1"><label className="text-[10px] font-bold text-slate-400 uppercase">备注说明</label><textarea className="w-full bg-slate-50 border border-slate-100 p-3 rounded-xl text-sm font-bold outline-none h-24 resize-none" /></div>
-                </div>
-                <div className="flex space-x-4 pt-4">
-                   <button onClick={() => setShowAddModal(false)} className="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-sm">取消</button>
-                   <button onClick={() => { alert('已保存'); setShowAddModal(false); }} className="flex-1 py-3 bg-[#2B579A] text-white rounded-xl font-bold text-sm">保存</button>
-                </div>
-             </div>
-          </div>
-        )}
       </main>
-
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
