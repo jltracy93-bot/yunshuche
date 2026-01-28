@@ -348,10 +348,6 @@ const PCAdmin: React.FC = () => {
             </button>
           ))}
         </nav>
-
-        <div className="p-8 border-t border-white/5 bg-[#244A85]/40 text-center">
-           <p className="text-[10px] text-blue-200/40 font-black uppercase tracking-tighter">Powered by Nanyun OA</p>
-        </div>
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden relative">
