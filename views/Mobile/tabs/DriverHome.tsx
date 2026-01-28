@@ -1,27 +1,54 @@
 
 import React from 'react';
-import { TransportStatus } from '../../../types';
+import { TransportStatus, DetailedOrder } from '../../../types';
 import { Icon } from '../icons';
 
-const DriverHome: React.FC = () => {
-  // 增加今日订单统计
+interface Props {
+  onOpenOrder: (order: DetailedOrder) => void;
+  onOpenPlayback: (order: DetailedOrder) => void;
+}
+
+const DriverHome: React.FC<Props> = ({ onOpenOrder, onOpenPlayback }) => {
   const stats = [
     { label: '今日运量', value: '48', unit: '吨' },
     { label: '今日订单', value: '3', unit: '单' },
     { label: '累计运量', value: '1,204', unit: '吨' },
   ];
 
-  const currentJob = {
+  const currentJob: DetailedOrder = {
     id: 'WO20231027001',
+    plateNumber: '苏A 88888',
     status: TransportStatus.IN_TRANSIT,
-    target: '栖霞再生中心 3#卸货区',
-    weight: '24.5吨',
-    vehicleType: '重型自卸货车' // 增加车辆类型数据
+    sender: '滨江联合热电',
+    receiver: '栖霞再生中心 3#卸货区',
+    cargoType: '粉煤灰',
+    createdAt: '2023-10-27 14:30'
   };
+
+  const historyJobs: DetailedOrder[] = [
+    {
+      id: 'WO20231026042',
+      plateNumber: '苏A 88888',
+      status: TransportStatus.COMPLETED,
+      sender: '滨江热电',
+      receiver: '栖霞消纳场',
+      cargoType: '粉煤灰',
+      createdAt: '2023-10-26 14:00'
+    },
+    {
+      id: 'WO20231025091',
+      plateNumber: '苏A 88888',
+      status: TransportStatus.COMPLETED,
+      sender: '滨江热电',
+      receiver: '六合再生基地',
+      cargoType: '炉渣',
+      createdAt: '2023-10-25 09:30'
+    }
+  ];
 
   return (
     <div className="p-5 space-y-6 animate-fade-in no-scrollbar pb-10">
-      {/* 司机身份卡 - 展示车辆类型 */}
+      {/* 司机身份卡 */}
       <div className="bg-slate-900 rounded-[2.5rem] p-7 text-white shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
         <div className="relative z-10">
@@ -30,8 +57,8 @@ const DriverHome: React.FC = () => {
              <div>
                 <h2 className="text-xl font-black tracking-tight">师傅，辛苦了</h2>
                 <div className="flex items-center space-x-2 mt-1.5">
-                  <span className="text-[10px] bg-blue-600 px-2 py-0.5 rounded-lg font-black shadow-lg shadow-blue-900/40">苏A 88888</span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{currentJob.vehicleType}</span>
+                  <span className="text-[10px] bg-blue-600 px-2 py-0.5 rounded-lg font-black shadow-lg shadow-blue-900/40">{currentJob.plateNumber}</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">重型自卸货车</span>
                 </div>
              </div>
           </div>
@@ -58,13 +85,12 @@ const DriverHome: React.FC = () => {
         </div>
         
         <div className="space-y-4">
-           {/* 目的地 + 导航按钮 */}
            <div className="flex items-center justify-between bg-slate-50/80 p-4 rounded-2xl border border-white shadow-inner">
               <div className="flex items-center space-x-3 overflow-hidden">
                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-500 shadow-sm shrink-0"><Icon.Map /></div>
                 <div className="overflow-hidden">
                   <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">卸货目的地</p>
-                  <p className="text-xs font-black text-slate-700 truncate">{currentJob.target}</p>
+                  <p className="text-xs font-black text-slate-700 truncate">{currentJob.receiver}</p>
                 </div>
               </div>
               <button 
@@ -76,20 +102,24 @@ const DriverHome: React.FC = () => {
               </button>
            </div>
 
-           {/* 称重信息展示 */}
            <div className="flex items-center space-x-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-50">
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm"><Icon.Stats /></div>
-              <div>
-                <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">地磅记录重量</p>
-                <p className="text-xs font-black text-slate-700">{currentJob.weight}</p>
+              <div className="flex-1 flex justify-between items-center">
+                <div>
+                  <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">地磅记录重量</p>
+                  <p className="text-xs font-black text-slate-700">24.5吨</p>
+                </div>
+                <button 
+                  onClick={() => onOpenPlayback(currentJob)}
+                  className="px-4 py-2 bg-slate-100 rounded-lg text-[9px] font-black text-slate-600 active:bg-slate-200"
+                >查看轨迹</button>
               </div>
            </div>
         </div>
         
-        {/* 重点优化：加高还原的拍照按钮 */}
         <button 
-          onClick={() => alert('跳转取证拍照页面')}
-          className="w-full h-20 bg-gradient-to-r from-blue-600 to-blue-700 rounded-[1.8rem] text-white font-black text-base shadow-2xl shadow-blue-200 flex items-center justify-center space-x-4 active:scale-[0.97] active:shadow-lg transition-all border-b-4 border-blue-800"
+          onClick={() => onOpenOrder(currentJob)}
+          className="w-full h-20 bg-gradient-to-r from-blue-600 to-blue-700 rounded-[1.8rem] text-white font-black text-base shadow-2xl shadow-blue-200 flex items-center justify-center space-x-4 active:scale-[0.97] transition-all border-b-4 border-blue-800"
         >
           <div className="bg-white/20 p-2.5 rounded-2xl shadow-inner">
             <Icon.Camera />
@@ -107,16 +137,21 @@ const DriverHome: React.FC = () => {
             <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">近期运单回顾</h3>
             <span className="text-[10px] font-black text-blue-600">全部历史 ›</span>
         </div>
-        {[1, 2].map((i) => (
-           <div key={i} className="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm flex items-center justify-between active:bg-slate-50 transition-colors">
+        {historyJobs.map((job, i) => (
+           <div key={job.id} className="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm flex items-center justify-between active:bg-slate-50 transition-colors group">
               <div className="flex items-center space-x-4">
-                 <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 font-mono text-[10px] font-black">#0{i}</div>
-                 <div>
-                    <p className="text-xs font-black text-slate-800">滨江热电 → {i === 1 ? '栖霞消纳场' : '六合再生基地'}</p>
-                    <p className="text-[9px] text-slate-400 font-bold mt-0.5">2023-10-2{6-i} 14:00 • 24.{5+i}T</p>
+                 <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 font-mono text-[10px] font-black">#0{i+1}</div>
+                 <div onClick={() => onOpenOrder(job)}>
+                    <p className="text-xs font-black text-slate-800">{job.sender} → {job.receiver.slice(0, 5)}...</p>
+                    <p className="text-[9px] text-slate-400 font-bold mt-0.5">{job.createdAt} • 24.5T</p>
                  </div>
               </div>
-              <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-lg">已完结</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); onOpenPlayback(job); }}
+                className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                轨迹
+              </button>
            </div>
         ))}
       </section>
@@ -124,7 +159,6 @@ const DriverHome: React.FC = () => {
       <style>{`
         .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
   );

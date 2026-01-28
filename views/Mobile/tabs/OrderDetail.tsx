@@ -6,9 +6,10 @@ import { Icon } from '../icons';
 interface Props {
   order: DetailedOrder;
   onBack: () => void;
+  onOpenPlayback: (order: DetailedOrder) => void;
 }
 
-const OrderDetail: React.FC<Props> = ({ order, onBack }) => {
+const OrderDetail: React.FC<Props> = ({ order, onBack, onOpenPlayback }) => {
   const [activeTab, setActiveTab] = useState<'basic' | 'event'>('basic');
 
   const timelineEvents = [
@@ -30,14 +31,6 @@ const OrderDetail: React.FC<Props> = ({ order, onBack }) => {
       icon: <Icon.Truck />
     },
     {
-      type: 'alert',
-      title: '行驶异常提醒',
-      time: '18:10:05',
-      detail: '检测到车辆行驶偏离预设轨迹 1.2km',
-      status: 'warning',
-      icon: <Icon.Alert />
-    },
-    {
       type: 'dump',
       title: '指定点倾倒拍照',
       time: '18:17:15',
@@ -45,22 +38,13 @@ const OrderDetail: React.FC<Props> = ({ order, onBack }) => {
       status: 'processing',
       hasPhoto: true,
       icon: <Icon.Camera />
-    },
-    {
-      type: 'finish',
-      title: '运输流程完结',
-      time: '-- : --',
-      detail: '等待大数据中心最终审核',
-      status: 'pending',
-      icon: <Icon.Home />
     }
   ];
 
   return (
     <div className="absolute inset-0 bg-[#F7F9FC] z-[100] flex flex-col animate-in fade-in slide-in-from-right duration-300 overflow-hidden">
-      {/* Page Header - Overwrites global header */}
       <header className="px-5 pt-12 pb-4 bg-white border-b border-slate-100 flex items-center shrink-0">
-        <button onClick={onBack} className="p-2 -ml-2 text-slate-400 active:scale-90 transition-transform">
+        <button onClick={onBack} className="p-2 -ml-2 text-slate-400 active:scale-90">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
           </svg>
@@ -73,7 +57,6 @@ const OrderDetail: React.FC<Props> = ({ order, onBack }) => {
         </span>
       </header>
 
-      {/* Internal Tabs */}
       <div className="px-5 py-3 bg-white border-b border-slate-50 shrink-0">
         <div className="bg-slate-100 p-1 rounded-xl flex w-full">
           <button
@@ -132,19 +115,15 @@ const OrderDetail: React.FC<Props> = ({ order, onBack }) => {
                     <p className="text-[9px] text-slate-400 font-bold uppercase">称重吨位</p>
                     <p className="text-[11px] font-black text-slate-700 mt-0.5">24.52 T</p>
                  </div>
-                 <div>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">跟车人员</p>
-                    <p className="text-[11px] font-black text-slate-700 mt-0.5">张师傅</p>
-                 </div>
-                 <div>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">建立时间</p>
-                    <p className="text-[11px] font-black text-slate-700 mt-0.5">{order.createdAt}</p>
-                 </div>
               </div>
             </div>
             
-            <button className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs shadow-lg active:scale-95 transition-all">
-                进入实时轨迹追踪
+            <button 
+              onClick={() => onOpenPlayback(order)}
+              className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs shadow-lg active:scale-95 transition-all flex items-center justify-center space-x-2"
+            >
+                <Icon.Map />
+                <span>查看该单历史轨迹回放</span>
             </button>
           </div>
         ) : (
@@ -153,32 +132,17 @@ const OrderDetail: React.FC<Props> = ({ order, onBack }) => {
               <div className="absolute left-[13px] top-2 bottom-2 w-px bg-slate-100"></div>
               {timelineEvents.map((ev, i) => (
                 <div key={i} className="relative">
-                  <div className={`absolute -left-[45px] top-0 w-10 h-10 rounded-2xl flex items-center justify-center border-4 border-white shadow-sm z-10 transition-colors ${
-                    ev.status === 'completed' ? 'bg-green-50 text-green-600' : 
-                    ev.status === 'warning' ? 'bg-rose-50 text-rose-600' :
-                    ev.status === 'processing' ? 'bg-blue-50 text-blue-600 animate-pulse' : 'bg-slate-50 text-slate-300'
+                  <div className={`absolute -left-[45px] top-0 w-10 h-10 rounded-2xl flex items-center justify-center border-4 border-white shadow-sm z-10 ${
+                    ev.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600 animate-pulse'
                   }`}>
                     <div className="scale-75">{ev.icon}</div>
                   </div>
-
                   <div className="space-y-1">
                     <div className="flex justify-between items-start">
-                      <p className={`text-[13px] font-black ${
-                        ev.status === 'completed' ? 'text-slate-900' : 
-                        ev.status === 'warning' ? 'text-rose-600' :
-                        ev.status === 'processing' ? 'text-blue-600' : 'text-slate-400'
-                      }`}>
-                        {ev.title}
-                      </p>
+                      <p className="text-[13px] font-black text-slate-900">{ev.title}</p>
                       <span className="text-[9px] text-slate-300 font-bold">{ev.time}</span>
                     </div>
                     <p className="text-[10px] text-slate-400 font-medium leading-relaxed">{ev.detail}</p>
-                    
-                    {ev.hasPhoto && (ev.status === 'completed' || ev.status === 'processing') && (
-                      <div className="mt-3 w-44 h-28 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden shadow-sm">
-                         <img src={`https://picsum.photos/seed/${ev.type}/400/240`} alt="Evidence" className="w-full h-full object-cover grayscale transition-all active:grayscale-0" />
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}

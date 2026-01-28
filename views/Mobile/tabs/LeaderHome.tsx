@@ -6,9 +6,10 @@ import { Icon } from '../icons';
 interface Props {
   onOpenSub: (sub: string) => void;
   onOpenOrder: (order: DetailedOrder) => void;
+  onOpenPlayback: (order: DetailedOrder) => void;
 }
 
-const LeaderHome: React.FC<Props> = ({ onOpenSub, onOpenOrder }) => {
+const LeaderHome: React.FC<Props> = ({ onOpenSub, onOpenOrder, onOpenPlayback }) => {
   const stats = [
     { label: '装货', value: 8, color: 'text-orange-500', bg: 'bg-orange-50/50' },
     { label: '运输', value: 12, color: 'text-blue-500', bg: 'bg-blue-50/50' },
@@ -105,24 +106,6 @@ const LeaderHome: React.FC<Props> = ({ onOpenSub, onOpenOrder }) => {
         <span className="text-rose-300 text-sm ml-2 font-black">›</span>
       </section>
 
-      {/* Main Actions - Compact Cards */}
-      <section className="grid grid-cols-2 gap-3">
-        <button 
-          onClick={() => onOpenSub('vehicles')}
-          className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-3 active:scale-95 transition-all active:bg-slate-50"
-        >
-          <div className="p-2 bg-blue-50 text-blue-600 rounded-xl"><Icon.Truck /></div>
-          <span className="text-xs font-black text-slate-700">车辆档案</span>
-        </button>
-        <button 
-          onClick={() => onOpenSub('publish')}
-          className="bg-blue-600 p-4 rounded-2xl shadow-lg shadow-blue-100 flex items-center space-x-3 active:scale-95 transition-all active:bg-blue-700"
-        >
-          <div className="p-2 bg-white/20 text-white rounded-xl"><Icon.Plus /></div>
-          <span className="text-xs font-black text-white">快速发单</span>
-        </button>
-      </section>
-
       {/* Compact Order List */}
       <section className="space-y-3">
         <div className="flex justify-between items-center px-1">
@@ -163,11 +146,17 @@ const LeaderHome: React.FC<Props> = ({ onOpenSub, onOpenOrder }) => {
             </div>
 
             <div className="flex space-x-2 mt-3">
-              <button className="flex-1 bg-slate-100 text-slate-600 py-2 rounded-xl text-[9px] font-black flex items-center justify-center space-x-1.5 active:bg-slate-200">
+              <button 
+                onClick={(e) => { e.stopPropagation(); onOpenPlayback(order); }}
+                className="flex-1 bg-slate-100 text-slate-600 py-2 rounded-xl text-[9px] font-black flex items-center justify-center space-x-1.5 active:bg-slate-200 transition-colors"
+              >
                 <span className="scale-[0.7]"><Icon.Map /></span>
                 <span>轨迹</span>
               </button>
-              <button className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl text-[9px] font-black flex items-center justify-center space-x-1.5 active:bg-blue-100">
+              <button 
+                onClick={(e) => { e.stopPropagation(); onOpenOrder(order); }}
+                className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl text-[9px] font-black flex items-center justify-center space-x-1.5 active:bg-blue-100 transition-colors"
+              >
                 <span>流程追溯</span>
                 <span>›</span>
               </button>

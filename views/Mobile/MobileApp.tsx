@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { UserRole, DetailedOrder } from '../../types';
 import LeaderHome from './tabs/LeaderHome';
 import DriverHome from './tabs/DriverHome';
-import TrajectoryView from './tabs/TrajectoryView';
+import OrderHistoryView from './tabs/OrderHistoryView';
+import TrajectoryPlayback from './tabs/TrajectoryPlayback';
 import DashboardView from './tabs/DashboardView';
 import ProfileView from './tabs/ProfileView';
 import OrderDetail from './tabs/OrderDetail';
@@ -17,33 +18,43 @@ const MobileApp: React.FC = () => {
   const [role, setRole] = useState<UserRole>(UserRole.LEADER);
   const [activeTab, setActiveTab] = useState('home');
   const [selectedOrder, setSelectedOrder] = useState<DetailedOrder | null>(null);
+  const [playbackOrder, setPlaybackOrder] = useState<DetailedOrder | null>(null);
   const [activeSubView, setActiveSubView] = useState<string | null>(null);
 
   const leaderTabs = [
     { id: 'home', label: '首页', icon: <Icon.Home /> },
-    { id: 'trajectory', label: '监控', icon: <Icon.Map /> },
     { id: 'stats', label: '统计', icon: <Icon.Stats /> },
     { id: 'profile', label: '我的', icon: <Icon.User /> },
   ];
 
   const driverTabs = [
     { id: 'home', label: '首页', icon: <Icon.Home /> },
-    { id: 'trajectory', label: '轨迹', icon: <Icon.Map /> },
+    { id: 'history', label: '历史运单', icon: <Icon.Map /> },
     { id: 'profile', label: '我的', icon: <Icon.User /> },
   ];
 
   const tabs = role === UserRole.LEADER ? leaderTabs : driverTabs;
 
-  const isSecondaryActive = !!activeSubView || !!selectedOrder;
+  const isSecondaryActive = !!activeSubView || !!selectedOrder || !!playbackOrder;
 
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
         return role === UserRole.LEADER 
-          ? <LeaderHome onOpenSub={setActiveSubView} onOpenOrder={setSelectedOrder} /> 
-          : <DriverHome />;
-      case 'trajectory':
-        return <TrajectoryView />;
+          ? <LeaderHome 
+              onOpenSub={setActiveSubView} 
+              onOpenOrder={setSelectedOrder} 
+              onOpenPlayback={setPlaybackOrder}
+            /> 
+          : <DriverHome 
+              onOpenOrder={setSelectedOrder}
+              onOpenPlayback={setPlaybackOrder}
+            />;
+      case 'history':
+        return <OrderHistoryView 
+          onOpenOrder={setSelectedOrder} 
+          onOpenPlayback={setPlaybackOrder}
+        />;
       case 'stats':
         return <DashboardView />;
       case 'profile':
@@ -74,7 +85,18 @@ const MobileApp: React.FC = () => {
       {selectedOrder && (
         <OrderDetail 
           order={selectedOrder} 
-          onBack={() => setSelectedOrder(null)} 
+          onBack={() => setSelectedOrder(null)}
+          onOpenPlayback={(order) => {
+            setSelectedOrder(null);
+            setPlaybackOrder(order);
+          }}
+        />
+      )}
+
+      {playbackOrder && (
+        <TrajectoryPlayback 
+          order={playbackOrder} 
+          onBack={() => setPlaybackOrder(null)} 
         />
       )}
       
@@ -85,7 +107,13 @@ const MobileApp: React.FC = () => {
         />
       )}
       {activeSubView === 'publish' && <PublishOrder onBack={() => setActiveSubView(null)} />}
-      {activeSubView === 'alarms' && <AlarmList onBack={() => setActiveSubView(null)} />}
+      {activeSubView === 'alarms' && (
+        <AlarmList 
+          onBack={() => setActiveSubView(null)} 
+          onOpenOrder={setSelectedOrder}
+          onOpenPlayback={setPlaybackOrder}
+        />
+      )}
       {activeSubView === 'add-vehicle' && <AddVehicle onBack={() => setActiveSubView('vehicles')} />}
 
       {!isSecondaryActive && (
@@ -93,7 +121,10 @@ const MobileApp: React.FC = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setActiveSubView(null);
+              }}
               className={`flex flex-col items-center justify-center w-16 transition-all duration-300 ${
                 activeTab === tab.id ? 'text-blue-600' : 'text-slate-400'
               }`}
